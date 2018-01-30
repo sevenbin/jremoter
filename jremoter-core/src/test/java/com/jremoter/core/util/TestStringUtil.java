@@ -1,6 +1,8 @@
-package org.jremoter.core.util;
+package com.jremoter.core.util;
 
 import org.junit.Test;
+
+import com.jremoter.core.util.StringUtil;
 
 public class TestStringUtil {
 	
