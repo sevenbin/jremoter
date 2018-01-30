@@ -1,4 +1,4 @@
-package org.jremoter.core.util;
+package com.jremoter.core.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;

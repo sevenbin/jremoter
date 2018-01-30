@@ -1,4 +1,4 @@
-package org.jremoter.core.util;
+package com.jremoter.core.util;
 
 /**
  * class处理工具类
