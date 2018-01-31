@@ -11,6 +11,34 @@ public abstract class ObjectUtil {
 	
 	private ObjectUtil(){}
 	
+	public static Object parseType(Class<?> type,String value){
+		if(null == type || null == value){
+			return value;
+		}
+		if(int.class.equals(type) || Integer.class.equals(type)){
+			return Integer.parseInt(value);
+		}
+		if(double.class.equals(type) || Double.class.equals(type)){
+			return Double.parseDouble(value);
+		}
+		if(long.class.equals(type) || Long.class.equals(type)){
+			return Long.parseLong(value);
+		}
+		if(short.class.equals(type) || Short.class.equals(type)){
+			return Short.parseShort(value);
+		}
+		if(float.class.equals(type) || Float.class.equals(type)){
+			return Float.parseFloat(value);
+		}
+		if(boolean.class.equals(type) || Boolean.class.equals(type)){
+			return Boolean.parseBoolean(value);
+		}
+		if(byte.class.equals(type) || Byte.class.equals(type)){
+			return Byte.parseByte(value);
+		}
+		return value;
+	}
+	
 	/**
 	 * 判断数组是否相等
 	 * @param objectA
