@@ -1,0 +1,2 @@
+com.jremoter.core.proxy.support.NativeProxyFactory
+com.jremoter.core.proxy.support.CglibProxyFactory
