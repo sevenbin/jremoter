@@ -7,6 +7,7 @@ import com.jremoter.core.context.ApplicationContext;
 public interface BeanContainer {
 	
 	public ApplicationContext getApplicationContext();
+	public BeanContainerHandlerChain getBeanContainerHandlerChain();
 	
 	//初始化容器
 	public void initial();
