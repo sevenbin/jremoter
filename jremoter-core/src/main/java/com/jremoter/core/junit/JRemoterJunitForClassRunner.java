@@ -1,7 +1,9 @@
 package com.jremoter.core.junit;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.junit.rules.MethodRule;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
@@ -24,19 +26,25 @@ public class JRemoterJunitForClassRunner extends BlockJUnit4ClassRunner{
 	}
 	
 	@Override
-	protected Statement withBeforeClasses(Statement statement) {
+	protected List<MethodRule> rules(Object target) {
+		this.beanContainer.attachBean(target.getClass(),ClassUtil.getCamelClassName(target.getClass()),target);
 		this.applicationContext.refresh();
-		return super.withBeforeClasses(statement);
+		return super.rules(target);
 	}
-
+	
 	@Override
-	protected Statement withAfterClasses(Statement statement){
-		try{
-			this.applicationContext.close();
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return super.withAfterClasses(statement);
+	protected Statement withAfterClasses(final Statement statement){
+		return new Statement(){
+			@Override
+			public void evaluate() throws Throwable{
+				try{
+					statement.evaluate();
+					applicationContext.close();
+				}catch(IOException e){
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 
 }
