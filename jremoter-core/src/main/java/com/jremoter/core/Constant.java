@@ -29,5 +29,7 @@ public abstract class Constant {
 	public static final Option<String> O_BANNER = Option.create("jremoter.banner","default");
 	//Bean容器
 	public static final Option<String> O_BEAN_CONTAINER_FACTORY = Option.create("jremoter.bean_container_factory","default");
+	//插件管理器
+	public static final Option<String> O_PLUGIN_MANAGER = Option.create("jremoter.plugin_manager","default");
 	
 }

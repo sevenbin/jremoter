@@ -18,6 +18,7 @@ import com.jremoter.core.context.ApplicationContextBanner;
 import com.jremoter.core.option.Configuration;
 import com.jremoter.core.option.support.AbstractConfiguration;
 import com.jremoter.core.pattern.PatternMatcher;
+import com.jremoter.core.plugin.PluginManager;
 import com.jremoter.core.scanner.PackageScanner;
 import com.jremoter.core.scanner.support.DefaultPackageScannerHandler;
 import com.jremoter.core.toolkit.ExtensionLoader;
@@ -31,6 +32,7 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 	protected BeanContainerFactory beanContainerFactory;
 	protected BeanContainer beanContainer;
 	protected ApplicationContextBanner banner;
+	protected PluginManager pluginManager;
 	
 	public AbstractApplicationContext(Class<?> runner){
 		if(null == runner){
@@ -47,8 +49,8 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 		this.configuration = AbstractConfiguration.getConfiguration();
 		this.beanContainerFactory = ExtensionLoader.getService(BeanContainerFactory.class,configuration.getOption(Constant.O_BEAN_CONTAINER_FACTORY));
 		this.beanContainer = beanContainerFactory.createBeanContainer(this);
+		this.pluginManager = ExtensionLoader.getService(PluginManager.class,this.configuration.getOption(Constant.O_PLUGIN_MANAGER));
 		this.banner = ExtensionLoader.getService(ApplicationContextBanner.class,this.configuration.getOption(Constant.O_BANNER));
-		
 		this.banner.write(System.out);
 		
 		PatternMatcher patternMatcher = ExtensionLoader.getService(PatternMatcher.class,configuration.getOption(Constant.O_PACKAGE_PATTERN_MATCHER));
@@ -60,8 +62,8 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 		packageScanner.addPattern(this.runner.getPackage().getName());
 		packageScanner.addPattern(parrerns.toArray(new String[parrerns.size()]));
 		packageScanner.getPackageScannerHandlerChain().addLast("scanner",this);
-		
 		this.beanContainer.attachBean(this.runner,BeanScope.Singleton,ClassUtil.getCamelClassName(this.runner));
+		this.pluginManager.start(this,this.beanContainer,packageScanner);
 		for(Class<?> type : packageScanner.scan(patternMatcher)){
 			String beanName = this.getBeanName(type);
 			BeanScope beanScope = this.getBeanScope(type);
@@ -74,6 +76,9 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 	
 	@Override
 	public void close() throws IOException{
+		if(null != this.pluginManager){
+			this.pluginManager.stop(this,this.beanContainer);
+		}
 		if(null != this.beanContainer){
 			this.beanContainer.destory();
 		}

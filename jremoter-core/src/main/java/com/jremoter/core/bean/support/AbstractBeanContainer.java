@@ -60,7 +60,6 @@ public abstract class AbstractBeanContainer implements BeanContainer{
 		this.proxyFactory = ExtensionLoader.getService(ProxyFactory.class,this.configuration.getOption(Constant.O_PROXY_FACTORY));
 		this.beanDefinitionFactory = ExtensionLoader.getService(BeanDefinitionFactory.class,this.configuration.getOption(Constant.O_BEAN_DEFINITION_FACTORY));
 		this.beanDefinitions = new ConcurrentHashMap<String,BeanDefinition>();
-		
 	}
 	
 	@Override
