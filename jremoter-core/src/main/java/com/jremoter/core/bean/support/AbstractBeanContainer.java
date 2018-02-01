@@ -1,5 +1,7 @@
 package com.jremoter.core.bean.support;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.jremoter.core.Constant;
+import com.jremoter.core.annotation.Autowired;
 import com.jremoter.core.annotation.Service;
 import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.bean.BeanContainerHandlerChain;
@@ -230,7 +233,64 @@ public abstract class AbstractBeanContainer implements BeanContainer{
 
 	//添加对象到有向图中
 	protected BeanDefinition processDirectedGraph(BeanDefinition beanDefinition,DirectedGraph<BeanDefinition> directedGraph){
-		return null;
+		
+		if(beanDefinition instanceof DefaultBeanDefinitionPrototypeFromMethod || beanDefinition instanceof DefaultBeanDefinitionSingletonFromMethod){
+			Method method = null;
+			BeanDefinition methodBeanDefinition = null;
+			if(beanDefinition instanceof DefaultBeanDefinitionPrototypeFromMethod){
+				DefaultBeanDefinitionPrototypeFromMethod defaultBeanDefinitionPrototypeFromMethod = (DefaultBeanDefinitionPrototypeFromMethod)beanDefinition;
+				method = defaultBeanDefinitionPrototypeFromMethod.getMethod();
+				methodBeanDefinition = defaultBeanDefinitionPrototypeFromMethod.getMethodBeanDefinition();
+			}else{
+				DefaultBeanDefinitionSingletonFromMethod defaultBeanDefinitionSingletonFromMethod = (DefaultBeanDefinitionSingletonFromMethod)beanDefinition;
+				method = defaultBeanDefinitionSingletonFromMethod.getMethod();
+				methodBeanDefinition = defaultBeanDefinitionSingletonFromMethod.getMethodBeanDefinition();
+			}
+			directedGraph.addEdge(beanDefinition,methodBeanDefinition);
+			Class<?>[] parameterTypes = method.getParameterTypes();
+			if(null == parameterTypes || parameterTypes.length == 0){
+				directedGraph.addNode(beanDefinition);
+				return beanDefinition;
+			}
+			Annotation[] annotations = AnnotationUtil.getAnnotationFromParameter(method,Autowired.class);
+			for(int i=0;i<parameterTypes.length;i++){
+				if(null == annotations[i]){
+					continue;
+				}
+				Class<?> parameterType = parameterTypes[i];
+				Autowired autowired = (Autowired)annotations[i];
+				String beanName = autowired.value();
+				if(StringUtil.isBlank(beanName)){
+					beanName = ClassUtil.getCamelClassName(parameterType);
+				}
+				BeanDefinition tempMethodBeanDefinition = this.getBeanDefinitionWithException(parameterType,beanName);
+				directedGraph.addEdge(beanDefinition, tempMethodBeanDefinition);
+			}
+		}else if(beanDefinition instanceof DefaultBeanDefinitionSingletonInstance){
+			directedGraph.addNode(beanDefinition);
+		}else{
+			Constructor<?> constructor = beanDefinition.getConstructor();
+			Class<?>[] parameterTypes = constructor.getParameterTypes();
+			if(null == parameterTypes || parameterTypes.length == 0){
+				directedGraph.addNode(beanDefinition);
+				return beanDefinition;
+			}
+			Annotation[] annotations = AnnotationUtil.getAnnotationFromParameter(constructor,Autowired.class);
+			for(int i=0;i<parameterTypes.length;i++){
+				if(null == annotations[i]){
+					continue;
+				}
+				Class<?> parameterType = parameterTypes[i];
+				Autowired autowired = (Autowired)annotations[i];
+				String beanName = autowired.value();
+				if(StringUtil.isBlank(beanName)){
+					beanName = ClassUtil.getCamelClassName(parameterType);
+				}
+				BeanDefinition methodBeanDefinition = this.getBeanDefinitionWithException(parameterType,beanName);
+				directedGraph.addEdge(beanDefinition, methodBeanDefinition);
+			}
+		}
+		return beanDefinition;
 	}
 	
 	protected BeanDefinition getBeanDefinitionWithException(Class<?> requireType,String beanName){

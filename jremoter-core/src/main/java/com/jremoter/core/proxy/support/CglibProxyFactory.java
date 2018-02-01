@@ -8,8 +8,8 @@ import com.jremoter.core.toolkit.ExtensionName;
 public class CglibProxyFactory extends AbstractProxyFactory{
 	
 	@Override
-	protected Object doCreateProxy(BeanContainer beanContainer,BeanDefinition beanDefinition) {
+	protected Object doCreateProxy(BeanContainer beanContainer,BeanDefinition beanDefinition){
 		return null;
 	}
-
+	
 }

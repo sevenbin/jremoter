@@ -46,7 +46,7 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 		packageScanner.addPattern(parrerns.toArray(new String[parrerns.size()]));
 		packageScanner.getPackageScannerHandlerChain().addLast("scanner",this);
 		
-		this.beanContainer.attachBean(this.runner,BeanScope.Prototype,ClassUtil.getCamelClassName(this.runner));
+		this.beanContainer.attachBean(this.runner,BeanScope.Singleton,ClassUtil.getCamelClassName(this.runner));
 		for(Class<?> type : packageScanner.scan(patternMatcher)){
 			String beanName = this.getBeanName(type);
 			BeanScope beanScope = this.getBeanScope(type);

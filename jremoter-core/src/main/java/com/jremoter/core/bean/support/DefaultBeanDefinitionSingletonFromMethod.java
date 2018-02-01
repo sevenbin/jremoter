@@ -27,4 +27,12 @@ public class DefaultBeanDefinitionSingletonFromMethod extends DefaultBeanDefinit
 		return null;
 	}
 	
+	public Method getMethod(){
+		return this.method;
+	}
+	
+	public BeanDefinition getMethodBeanDefinition(){
+		return this.methodBeanDefinition;
+	}
+	
 }
