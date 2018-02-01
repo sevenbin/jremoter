@@ -6,4 +6,6 @@ public interface BeanContainerHandlerChain extends HandlerChain<BeanContainerHan
 	
 	public BeanContainer getBeanContainer();
 	
+	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition,Object instance);
+	
 }

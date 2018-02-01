@@ -1,6 +1,8 @@
 package com.jremoter.core.bean.support;
 
+import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.bean.BeanContainerHandler;
+import com.jremoter.core.bean.BeanDefinition;
 import com.jremoter.core.handler.HandlerChain;
 
 public class DefaultBeanContainerHandlerFoot extends DefaultBeanContainerHandlerContext implements BeanContainerHandler{
@@ -14,6 +16,11 @@ public class DefaultBeanContainerHandlerFoot extends DefaultBeanContainerHandler
 	@Override
 	public BeanContainerHandler getHandler(){
 		return this;
+	}
+
+	@Override
+	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance){
+		
 	}
 	
 }

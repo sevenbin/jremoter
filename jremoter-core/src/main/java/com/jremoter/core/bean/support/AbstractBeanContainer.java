@@ -16,6 +16,8 @@ import com.jremoter.core.bean.BeanContainerHandlerChain;
 import com.jremoter.core.bean.BeanDefinition;
 import com.jremoter.core.bean.BeanDefinitionFactory;
 import com.jremoter.core.bean.BeanScope;
+import com.jremoter.core.bean.inject.FieldBeanInject;
+import com.jremoter.core.bean.inject.MethodBeanInject;
 import com.jremoter.core.context.ApplicationContext;
 import com.jremoter.core.exception.BeanCircleReferenceException;
 import com.jremoter.core.exception.BeanDefinitionExistException;
@@ -52,10 +54,13 @@ public abstract class AbstractBeanContainer implements BeanContainer{
 	public AbstractBeanContainer(ApplicationContext applicationContext){
 		this.applicationContext = applicationContext;
 		this.beanContainerHandlerChain = new DefaultBeanContainerHandlerChain(this);
+		this.beanContainerHandlerChain.addLast("inject_field",new FieldBeanInject());
+		this.beanContainerHandlerChain.addLast("inject_method",new MethodBeanInject());
 		this.configuration = AbstractConfiguration.getConfiguration();
 		this.proxyFactory = ExtensionLoader.getService(ProxyFactory.class,this.configuration.getOption(Constant.O_PROXY_FACTORY));
 		this.beanDefinitionFactory = ExtensionLoader.getService(BeanDefinitionFactory.class,this.configuration.getOption(Constant.O_BEAN_DEFINITION_FACTORY));
 		this.beanDefinitions = new ConcurrentHashMap<String,BeanDefinition>();
+		
 	}
 	
 	@Override

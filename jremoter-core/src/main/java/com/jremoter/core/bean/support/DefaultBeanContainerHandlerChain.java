@@ -3,6 +3,7 @@ package com.jremoter.core.bean.support;
 import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.bean.BeanContainerHandler;
 import com.jremoter.core.bean.BeanContainerHandlerChain;
+import com.jremoter.core.bean.BeanDefinition;
 import com.jremoter.core.handler.HandlerContext;
 import com.jremoter.core.handler.support.AbstractHandlerChain;
 
@@ -32,6 +33,15 @@ public class DefaultBeanContainerHandlerChain extends AbstractHandlerChain<BeanC
 	@Override
 	protected HandlerContext<BeanContainerHandler> createHandlerContext(String name, BeanContainerHandler handler){
 		return new DefaultBeanContainerHandlerContext(this,name,handler);
+	}
+
+	@Override
+	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance) {
+		HandlerContext<BeanContainerHandler> context = this.head.getNext();
+		while(context != this.foot){
+			context.getHandler().onInject(beanContainer, beanDefinition, instance);
+			context = context.getNext();
+		}
 	}
 	
 }

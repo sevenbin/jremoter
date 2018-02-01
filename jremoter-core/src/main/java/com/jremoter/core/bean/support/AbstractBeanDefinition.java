@@ -134,7 +134,7 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	
 	//注入
 	protected void injectObject(Object object){
-		
+		this.beanContainer.getBeanContainerHandlerChain().onInject(this.beanContainer,this,object);
 	}
 	
 	protected Constructor<?> choseConstructor(Class<?> type){
