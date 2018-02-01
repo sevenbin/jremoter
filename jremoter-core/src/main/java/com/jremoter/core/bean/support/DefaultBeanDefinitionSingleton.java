@@ -46,8 +46,8 @@ public class DefaultBeanDefinitionSingleton extends AbstractBeanDefinition{
 
 	@Override
 	public void destory(){
-		this.instance = null;
 		super.destory();
+		this.instance = null;
 	}
 	
 }

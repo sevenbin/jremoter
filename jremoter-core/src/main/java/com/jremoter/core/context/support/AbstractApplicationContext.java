@@ -12,6 +12,7 @@ import com.jremoter.core.bean.BeanContainerFactory;
 import com.jremoter.core.bean.BeanDefinition;
 import com.jremoter.core.bean.BeanScope;
 import com.jremoter.core.context.ApplicationContext;
+import com.jremoter.core.context.ApplicationContextBanner;
 import com.jremoter.core.option.Configuration;
 import com.jremoter.core.option.support.AbstractConfiguration;
 import com.jremoter.core.pattern.PatternMatcher;
@@ -24,7 +25,9 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 	
 	protected Configuration configuration;
 	protected Class<?> runner;
+	protected BeanContainerFactory beanContainerFactory;
 	protected BeanContainer beanContainer;
+	protected ApplicationContextBanner banner;
 	
 	public AbstractApplicationContext(Class<?> runner){
 		this.runner = runner;
@@ -33,12 +36,13 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 	@Override
 	public void refresh(){
 		this.configuration = AbstractConfiguration.getConfiguration();
-		BeanContainerFactory beanContainerFactory = ExtensionLoader.getService(BeanContainerFactory.class,configuration.getOption(Constant.O_BEAN_CONTAINER_FACTORY));
+		this.beanContainerFactory = ExtensionLoader.getService(BeanContainerFactory.class,configuration.getOption(Constant.O_BEAN_CONTAINER_FACTORY));
+		this.beanContainer = beanContainerFactory.createBeanContainer(this);
+		this.banner = ExtensionLoader.getService(ApplicationContextBanner.class,this.configuration.getOption(Constant.O_BANNER));
+		
+		this.banner.write(System.out);
 		
 		PatternMatcher patternMatcher = ExtensionLoader.getService(PatternMatcher.class,configuration.getOption(Constant.O_PACKAGE_PATTERN_MATCHER));
-		
-		this.beanContainer = beanContainerFactory.createBeanContainer(this);
-		
 		Set<String> parrerns = this.searchConfigurationPatterns(this.runner.getPackage().getName());
 		
 		PackageScanner packageScanner = this.createPackageScanner();
