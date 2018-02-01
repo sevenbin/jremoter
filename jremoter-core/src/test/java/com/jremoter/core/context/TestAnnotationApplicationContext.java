@@ -11,7 +11,7 @@ import com.jremoter.core.annotation.JRemoterApplication;
 import com.jremoter.core.context.support.AnnotationApplicationContext;
 
 @JRemoterApplication
-@Configuration
+@Configuration(patterns="com.jremoter.core")
 public class TestAnnotationApplicationContext {
 	
 	@Test

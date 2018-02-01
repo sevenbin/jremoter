@@ -53,8 +53,9 @@ public class AnnotationApplicationContext extends AbstractApplicationContext{
 	}
 
 	@Override
-	protected Set<String> searchConfigurationPatterns(String packagePattern) {
+	protected Set<String> searchConfigurationPatterns(String packagePattern,Set<String> history){
 		Set<String> parrerns = new LinkedHashSet<String>();
+		history.add(packagePattern);
 		log.debug("scan {} package ",packagePattern);
 		PatternMatcher patternMatcher = ExtensionLoader.getService(PatternMatcher.class,configuration.getOption(Constant.O_PACKAGE_PATTERN_MATCHER));
 		PackageScanner configPackageScanner = ExtensionLoader.getService(PackageScanner.class,this.configuration.getOption(Constant.O_PACKAGE_SCANNER));
@@ -66,11 +67,11 @@ public class AnnotationApplicationContext extends AbstractApplicationContext{
 				continue;
 			}
 			for(String pattern : configuration.patterns()){
-				if(StringUtil.isBlank(pattern)){
+				if(StringUtil.isBlank(pattern) || history.contains(pattern)){
 					continue;
 				}
 				parrerns.add(pattern);
-				parrerns.addAll(this.searchConfigurationPatterns(pattern));
+				parrerns.addAll(this.searchConfigurationPatterns(pattern,history));
 			}
 		}
 		return parrerns;

@@ -2,11 +2,13 @@ package com.jremoter.core.context.support;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import com.jremoter.core.Constant;
+import com.jremoter.core.annotation.JRemoterApplication;
 import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.bean.BeanContainerFactory;
 import com.jremoter.core.bean.BeanDefinition;
@@ -19,6 +21,7 @@ import com.jremoter.core.pattern.PatternMatcher;
 import com.jremoter.core.scanner.PackageScanner;
 import com.jremoter.core.scanner.support.DefaultPackageScannerHandler;
 import com.jremoter.core.toolkit.ExtensionLoader;
+import com.jremoter.core.util.AnnotationUtil;
 import com.jremoter.core.util.ClassUtil;
 
 public abstract class AbstractApplicationContext extends DefaultPackageScannerHandler implements ApplicationContext{
@@ -30,6 +33,12 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 	protected ApplicationContextBanner banner;
 	
 	public AbstractApplicationContext(Class<?> runner){
+		if(null == runner){
+			throw new NullPointerException("runner");
+		}
+		if(!AnnotationUtil.hasAnnotation(runner,JRemoterApplication.class)){
+			throw new IllegalArgumentException("runner class missing @JRemoterApplication annotation");
+		}
 		this.runner = runner;
 	}
 	
@@ -43,7 +52,9 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 		this.banner.write(System.out);
 		
 		PatternMatcher patternMatcher = ExtensionLoader.getService(PatternMatcher.class,configuration.getOption(Constant.O_PACKAGE_PATTERN_MATCHER));
-		Set<String> parrerns = this.searchConfigurationPatterns(this.runner.getPackage().getName());
+		Set<String> history = new LinkedHashSet<String>();
+		history.add(this.runner.getPackage().getName());
+		Set<String> parrerns = this.searchConfigurationPatterns(this.runner.getPackage().getName(),history);
 		
 		PackageScanner packageScanner = this.createPackageScanner();
 		packageScanner.addPattern(this.runner.getPackage().getName());
@@ -96,6 +107,6 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 	protected abstract BeanScope getBeanScope(Class<?> type);
 	protected abstract String getBeanName(Class<?> type);
 	protected abstract PackageScanner createPackageScanner();
-	protected abstract Set<String> searchConfigurationPatterns(String packagePattern);
+	protected abstract Set<String> searchConfigurationPatterns(String packagePattern,Set<String> history);
 	
 }
