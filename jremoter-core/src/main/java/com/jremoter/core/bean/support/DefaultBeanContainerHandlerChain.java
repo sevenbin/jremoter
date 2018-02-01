@@ -36,12 +36,23 @@ public class DefaultBeanContainerHandlerChain extends AbstractHandlerChain<BeanC
 	}
 
 	@Override
-	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance) {
+	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance){
 		HandlerContext<BeanContainerHandler> context = this.head.getNext();
 		while(context != this.foot){
 			context.getHandler().onInject(beanContainer, beanDefinition, instance);
 			context = context.getNext();
 		}
+	}
+
+	@Override
+	public boolean onNeedProxy(BeanContainer beanContainer,BeanDefinition beanDefinition){
+		boolean result = false;
+		HandlerContext<BeanContainerHandler> context = this.head.getNext();
+		while(context != this.foot){
+			result = context.getHandler().onNeedProxy(beanContainer,beanDefinition);
+			context = context.getNext();
+		}
+		return result;
 	}
 	
 }

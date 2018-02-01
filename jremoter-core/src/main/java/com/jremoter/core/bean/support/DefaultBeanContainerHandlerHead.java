@@ -23,4 +23,9 @@ public class DefaultBeanContainerHandlerHead extends DefaultBeanContainerHandler
 		
 	}
 	
+	@Override
+	public boolean onNeedProxy(BeanContainer beanContainer,BeanDefinition beanDefinition) {
+		return false;
+	}
+	
 }

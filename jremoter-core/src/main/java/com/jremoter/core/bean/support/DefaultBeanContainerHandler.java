@@ -10,5 +10,10 @@ public class DefaultBeanContainerHandler implements BeanContainerHandler{
 	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition,Object instance){
 		
 	}
+
+	@Override
+	public boolean onNeedProxy(BeanContainer beanContainer,BeanDefinition beanDefinition) {
+		return false;
+	}
 	
 }

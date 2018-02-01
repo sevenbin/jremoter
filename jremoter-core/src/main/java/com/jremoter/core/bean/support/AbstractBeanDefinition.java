@@ -109,7 +109,7 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	}
 	
 	protected boolean needCreateProxy(){
-		return false;
+		return this.beanContainer.getBeanContainerHandlerChain().onNeedProxy(beanContainer,this);
 	}
 	
 	//调用初始化方法

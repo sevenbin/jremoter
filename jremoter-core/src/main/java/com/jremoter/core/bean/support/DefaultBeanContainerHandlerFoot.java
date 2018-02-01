@@ -22,5 +22,10 @@ public class DefaultBeanContainerHandlerFoot extends DefaultBeanContainerHandler
 	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance){
 		
 	}
+
+	@Override
+	public boolean onNeedProxy(BeanContainer beanContainer,BeanDefinition beanDefinition) {
+		return false;
+	}
 	
 }
