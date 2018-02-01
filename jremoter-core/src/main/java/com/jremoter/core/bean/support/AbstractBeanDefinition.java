@@ -157,6 +157,27 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 			return ReflectionUtil.invokeMethod(method,object,parameterDatas);
 		}
 	}
+	
+	//调用方法并自动注入参数
+	protected Object invokeMethodAndAutowired(Method method,Object object){
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		if(null == parameterTypes || parameterTypes.length == 0){
+			return ReflectionUtil.invokeMethod(method,object);
+		}else{
+			Annotation[] annotations = AnnotationUtil.getAnnotationFromParameter(method,Autowired.class);
+			Object[] parameterDatas = new Object[parameterTypes.length];
+			for(int i=0;i<parameterTypes.length;i++){
+				Class<?> parameterType = parameterTypes[i];
+				if(null == annotations[i]){
+					parameterDatas[i] = null;
+				}else{
+					Autowired autowired = (Autowired)annotations[i];
+					parameterDatas[i] = this.getBeanInstance(parameterType,autowired.value());
+				}
+			}
+			return ReflectionUtil.invokeMethod(method,object,parameterDatas);
+		}
+	}
 
 	protected List<Method> searchMethods(final boolean isInitialMethodAnnotation){
 		List<Method> methods = new ArrayList<Method>();
