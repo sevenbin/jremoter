@@ -11,6 +11,10 @@ public class DefaultBeanDefinitionSingletonInstance extends DefaultBeanDefinitio
 		this.instance = instance;
 	}
 	
+	public void create() {
+		
+	}
+	
 	@Override
 	protected Constructor<?> choseConstructor(Class<?> type) {
 		return null;

@@ -10,6 +10,7 @@ import com.jremoter.core.annotation.DestoryMethod;
 import com.jremoter.core.annotation.InitialMethod;
 import com.jremoter.core.annotation.JRemoterApplication;
 import com.jremoter.core.annotation.Service;
+import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.context.support.AnnotationApplicationContext;
 
 @JRemoterApplication
@@ -21,6 +22,7 @@ public class TestAnnotationApplicationContext {
 		
 		ApplicationContext applicationContext = new AnnotationApplicationContext(TestAnnotationApplicationContext.class);
 		applicationContext.refresh();
+		System.out.println(applicationContext);
 		System.out.println(this);
 		applicationContext.close();
 		
@@ -35,9 +37,20 @@ public class TestAnnotationApplicationContext {
 	private TestService testService;
 	@Autowired
 	private DemoService demoService;
+	@Autowired
+	private ApplicationContext applicationContext;
+	@Autowired
+	private BeanContainer beanContainer;
+	@Autowired
+	private com.jremoter.core.option.Configuration configuration;
 	
 	@InitialMethod
 	public void init(){
+		
+		System.out.println(this.applicationContext);
+		System.out.println(this.beanContainer);
+		System.out.println(this.configuration);
+		
 		System.out.println(this.demoService.demo());
 		System.out.println(this.testService.getName());
 		System.out.println("init -> "+this);
