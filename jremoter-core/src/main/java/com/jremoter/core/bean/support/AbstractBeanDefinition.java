@@ -86,8 +86,8 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	
 	@Override
 	public void destory(){
-		this.initialMethods.clear();
-		this.destoryMethods.clear();
+		this.initialMethods = null;
+		this.destoryMethods = null;
 	}
 	
 	@Override
@@ -106,6 +106,10 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	@Override
 	public String toString() {
 		return String.format("%s#%s",this.beanType.getName(),this.beanName);
+	}
+	
+	protected boolean needCreateProxy(){
+		return false;
 	}
 	
 	//调用初始化方法
@@ -157,6 +161,26 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 			return ReflectionUtil.invokeMethod(method,object,parameterDatas);
 		}
 	}
+	
+	protected Object invokeConstructorAndAutowired(Constructor<?> constructor){
+		Class<?>[] parameterTypes = constructor.getParameterTypes();
+		if(null == parameterTypes || parameterTypes.length == 0){
+			return ReflectionUtil.invokeConstructor(constructor);
+		}else{
+			Annotation[] annotations = AnnotationUtil.getAnnotationFromParameter(constructor,Autowired.class);
+			Object[] parameterDatas = new Object[parameterTypes.length];
+			for(int i=0;i<parameterTypes.length;i++){
+				Class<?> parameterType = parameterTypes[i];
+				if(null == annotations[i]){
+					parameterDatas[i] = null;
+				}else{
+					Autowired autowired = (Autowired)annotations[i];
+					parameterDatas[i] = this.getBeanInstance(parameterType,autowired.value());
+				}
+			}
+			return ReflectionUtil.invokeConstructor(constructor,parameterDatas);
+		}
+	}
 
 	protected List<Method> searchMethods(final boolean isInitialMethodAnnotation){
 		List<Method> methods = new ArrayList<Method>();
@@ -192,7 +216,11 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	}
 	
 	protected Object createInstance(BeanContainer beanContainer,BeanDefinition beanDefinition){
-		return this.beanContainer.getProxyFactory().createProxy(beanContainer,beanDefinition);
+		if(this.needCreateProxy()){
+			return this.beanContainer.getProxyFactory().createProxy(beanContainer,beanDefinition);
+		}else{
+			return this.invokeConstructorAndAutowired(this.constructor);
+		}
 	}
 	
 	// 选择最优的构造函数
