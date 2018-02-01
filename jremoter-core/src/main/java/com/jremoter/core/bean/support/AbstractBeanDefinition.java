@@ -1,5 +1,6 @@
 package com.jremoter.core.bean.support;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -91,17 +92,48 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	
 	//调用初始化方法
 	protected void invokeInitialMethod(Object object){
-		
+		if(null == this.initialMethods || this.initialMethods.isEmpty()){
+			return;
+		}
+		for(Method method : this.initialMethods){
+			this.invokeMethodAndAutowired(method,object);
+		}
 	}
 	
 	//调用销毁方法
 	protected void invokeDestoryMethod(Object object){
-		
+		if(null == this.destoryMethods || this.destoryMethods.isEmpty()){
+			return;
+		}
+		for(Method method : this.destoryMethods){
+			this.invokeMethodAndAutowired(method,object);
+		}
 	}
 	
 	//注入
 	protected void injectObject(Object object){
 		
+	}
+	
+	//调用方法并自动注入参数
+	protected Object invokeMethodAndAutowired(Method method,Object object){
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		if(null == parameterTypes || parameterTypes.length == 0){
+			return ReflectionUtil.invokeMethod(method,object);
+		}else{
+			Annotation[] annotations = AnnotationUtil.getAnnotationFromParameter(method,Autowired.class);
+			Object[] parameterDatas = new Object[parameterTypes.length];
+			for(int i=0;i<parameterTypes.length;i++){
+				Class<?> parameterType = parameterTypes[i];
+				if(null == annotations[i]){
+					parameterDatas[i] = null;
+				}else{
+					Autowired autowired = (Autowired)annotations[i];
+					parameterDatas[i] = this.getBeanInstance(parameterType,autowired.value());
+				}
+			}
+			return ReflectionUtil.invokeMethod(method,object,parameterDatas);
+		}
 	}
 
 	protected List<Method> searchMethods(final boolean isInitialMethodAnnotation){
