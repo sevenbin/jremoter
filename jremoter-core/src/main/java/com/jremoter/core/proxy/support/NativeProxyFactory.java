@@ -11,5 +11,5 @@ public class NativeProxyFactory extends AbstractProxyFactory{
 	protected Object doCreateProxy(BeanContainer beanContainer,BeanDefinition beanDefinition) {
 		return null;
 	}
-	
+
 }

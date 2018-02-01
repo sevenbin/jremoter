@@ -3,11 +3,13 @@ package com.jremoter.core.bean;
 import java.util.Map;
 
 import com.jremoter.core.context.ApplicationContext;
+import com.jremoter.core.proxy.ProxyFactory;
 
 public interface BeanContainer {
 	
 	public ApplicationContext getApplicationContext();
 	public BeanContainerHandlerChain getBeanContainerHandlerChain();
+	public ProxyFactory getProxyFactory();
 	
 	//初始化容器
 	public void initial();
@@ -24,7 +26,8 @@ public interface BeanContainer {
 	public Map<String,BeanDefinition> getBeanDefinitions(Class<?> requireType);
 	
 	public BeanDefinition getBeanDefinition(Class<?> requireType,String beanName);
+	
 	//获取可注入的BeanDefinition对象,会抛出异常
-	public BeanDefinition getAutowiredBeanDefinition(Class<?> requireType,String beanName);
+//	public BeanDefinition getAutowiredBeanDefinition(Class<?> requireType,String beanName);
 	
 }
