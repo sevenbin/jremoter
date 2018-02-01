@@ -22,5 +22,6 @@ public abstract class Constant {
 	//路径匹配器
 	public static final Option<String> O_RESOURCE_PATTERN_MATCHER = Option.create("jremoter.resource_pattern_matcher","resource");
 	
+	public static final Option<String> O_PROXY_FACTORY = Option.create("jremoter.proxy_factory","native");
 	
 }

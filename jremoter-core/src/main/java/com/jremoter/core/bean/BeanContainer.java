@@ -24,7 +24,8 @@ public interface BeanContainer {
 	public Map<String,BeanDefinition> getBeanDefinitions(Class<?> requireType);
 	
 	public BeanDefinition getBeanDefinition(Class<?> requireType,String beanName);
+	
 	//获取可注入的BeanDefinition对象,会抛出异常
-	public BeanDefinition getAutowiredBeanDefinition(Class<?> requireType,String beanName);
+//	public BeanDefinition getAutowiredBeanDefinition(Class<?> requireType,String beanName);
 	
 }
