@@ -3,7 +3,11 @@ package com.jremoter.core.context;
 import java.io.Closeable;
 import java.util.Map;
 
+import com.jremoter.core.bean.BeanContainer;
+
 public interface ApplicationContext extends Closeable{
+	
+	public BeanContainer getBeanContainer();
 	
 	//刷新
 	public void refresh();

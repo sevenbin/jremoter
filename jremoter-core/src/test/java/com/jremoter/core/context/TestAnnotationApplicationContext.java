@@ -3,6 +3,7 @@ package com.jremoter.core.context;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.jremoter.core.annotation.Autowired;
 import com.jremoter.core.annotation.Configuration;
@@ -12,9 +13,11 @@ import com.jremoter.core.annotation.JRemoterApplication;
 import com.jremoter.core.annotation.Service;
 import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.context.support.AnnotationApplicationContext;
+import com.jremoter.core.junit.JRemoterJunitForClassRunner;
 
 @JRemoterApplication
 @Configuration(patterns="com.jremoter.core")
+@RunWith(JRemoterJunitForClassRunner.class)
 public class TestAnnotationApplicationContext {
 	
 	@Test

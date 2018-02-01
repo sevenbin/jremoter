@@ -107,6 +107,7 @@ public abstract class AbstractBeanContainer implements BeanContainer{
 		//注入
 		for(BeanDefinition beanDefinition : this.beanDefinitionSet){
 			beanDefinition.inject();
+			log.debug("found bean definition {}",beanDefinition);
 		}
 		
 		this.initial = true;

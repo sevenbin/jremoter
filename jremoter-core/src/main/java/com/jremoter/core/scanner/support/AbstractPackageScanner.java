@@ -99,7 +99,6 @@ public abstract class AbstractPackageScanner implements PackageScanner,ResourceM
 		String tempPackageDirName = tempPackageName.replace('.','/');
 		for(URL url : ResourceUtil.search(this,tempPackageDirName)){
 			String protocol = url.getProtocol();
-			log.debug("found url {}",url);
 			if(PROTOCOL_FILE.equals(protocol)){
 				try{
 					String filePath = URLDecoder.decode(url.getFile(),"UTF-8");
