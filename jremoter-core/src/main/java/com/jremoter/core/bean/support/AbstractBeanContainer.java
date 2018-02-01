@@ -229,7 +229,7 @@ public abstract class AbstractBeanContainer implements BeanContainer{
 				methodBeanName = service.value();
 			}
 			String methodKey = String.format("%s#%s",method.getReturnType(),methodBeanName);
-			BeanDefinition methodBeanDefinition = this.beanDefinitionFactory.createBeanDefinition(this, requireType,service.scope(), methodBeanName, beanDefinition, method);
+			BeanDefinition methodBeanDefinition = this.beanDefinitionFactory.createBeanDefinition(this, method.getReturnType(),service.scope(), methodBeanName, beanDefinition, method);
 			this.beanDefinitions.put(methodKey,methodBeanDefinition);
 			log.debug("create bean definition success [{}] -> {}",methodBeanDefinition.getClass(),methodBeanDefinition);
 		}

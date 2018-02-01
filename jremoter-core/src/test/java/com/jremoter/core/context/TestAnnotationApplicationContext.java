@@ -4,10 +4,12 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.jremoter.core.annotation.Autowired;
 import com.jremoter.core.annotation.Configuration;
 import com.jremoter.core.annotation.DestoryMethod;
 import com.jremoter.core.annotation.InitialMethod;
 import com.jremoter.core.annotation.JRemoterApplication;
+import com.jremoter.core.annotation.Service;
 import com.jremoter.core.context.support.AnnotationApplicationContext;
 
 @JRemoterApplication
@@ -24,8 +26,20 @@ public class TestAnnotationApplicationContext {
 		
 	}
 	
+	@Service
+	public DemoService demoService(){
+		return new DemoService();
+	}
+	
+	@Autowired
+	private TestService testService;
+	@Autowired
+	private DemoService demoService;
+	
 	@InitialMethod
 	public void init(){
+		System.out.println(this.demoService.demo());
+		System.out.println(this.testService.getName());
 		System.out.println("init -> "+this);
 	}
 	
