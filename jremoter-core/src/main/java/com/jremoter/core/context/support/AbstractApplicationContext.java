@@ -15,6 +15,8 @@ import com.jremoter.core.bean.BeanDefinition;
 import com.jremoter.core.bean.BeanScope;
 import com.jremoter.core.context.ApplicationContext;
 import com.jremoter.core.context.ApplicationContextBanner;
+import com.jremoter.core.logging.Logger;
+import com.jremoter.core.logging.LoggerFactory;
 import com.jremoter.core.option.Configuration;
 import com.jremoter.core.option.support.AbstractConfiguration;
 import com.jremoter.core.pattern.PatternMatcher;
@@ -26,6 +28,8 @@ import com.jremoter.core.util.AnnotationUtil;
 import com.jremoter.core.util.ClassUtil;
 
 public abstract class AbstractApplicationContext extends DefaultPackageScannerHandler implements ApplicationContext{
+	
+	private static final Logger log = LoggerFactory.getLogger(AbstractApplicationContext.class);
 	
 	protected Configuration configuration;
 	protected Class<?> runner;
@@ -42,26 +46,33 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 			throw new IllegalArgumentException("runner class missing @JRemoterApplication annotation");
 		}
 		this.runner = runner;
-	}
-	
-	@Override
-	public void refresh(){
 		this.configuration = AbstractConfiguration.getConfiguration();
+		this.banner = ExtensionLoader.getService(ApplicationContextBanner.class,this.configuration.getOption(Constant.O_BANNER));
+		this.banner.write(System.out);
 		this.beanContainerFactory = ExtensionLoader.getService(BeanContainerFactory.class,configuration.getOption(Constant.O_BEAN_CONTAINER_FACTORY));
 		this.beanContainer = beanContainerFactory.createBeanContainer(this);
 		this.pluginManager = ExtensionLoader.getService(PluginManager.class,this.configuration.getOption(Constant.O_PLUGIN_MANAGER));
-		this.banner = ExtensionLoader.getService(ApplicationContextBanner.class,this.configuration.getOption(Constant.O_BANNER));
-		this.banner.write(System.out);
-		
+		log.info("create application context success");
+	}
+	
+	@Override
+	public BeanContainer getBeanContainer() {
+		return this.beanContainer;
+	}
+
+	@Override
+	public void refresh(){
 		PatternMatcher patternMatcher = ExtensionLoader.getService(PatternMatcher.class,configuration.getOption(Constant.O_PACKAGE_PATTERN_MATCHER));
 		Set<String> history = new LinkedHashSet<String>();
 		history.add(this.runner.getPackage().getName());
-		Set<String> parrerns = this.searchConfigurationPatterns(this.runner.getPackage().getName(),history);
+		Set<String> patterns = this.searchConfigurationPatterns(this.runner.getPackage().getName(),history);
 		
 		PackageScanner packageScanner = this.createPackageScanner();
-		packageScanner.addPattern(this.runner.getPackage().getName());
-		packageScanner.addPattern(parrerns.toArray(new String[parrerns.size()]));
 		packageScanner.getPackageScannerHandlerChain().addLast("scanner",this);
+		packageScanner.addPattern(this.runner.getPackage().getName());
+		if(patterns.size() > 0){
+			packageScanner.addPattern(patterns.toArray(new String[patterns.size()]));
+		}
 		
 		this.beanContainer.attachBean(this.runner,BeanScope.Singleton,ClassUtil.getCamelClassName(this.runner));
 		this.beanContainer.attachBean(ApplicationContext.class,ClassUtil.getCamelClassName(ApplicationContext.class),this);
@@ -87,6 +98,7 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 		if(null != this.beanContainer){
 			this.beanContainer.destory();
 		}
+		log.info("close application context success");
 	}
 
 	@Override
