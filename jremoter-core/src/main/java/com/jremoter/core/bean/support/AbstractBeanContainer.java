@@ -1,11 +1,13 @@
 package com.jremoter.core.bean.support;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.jremoter.core.Constant;
+import com.jremoter.core.annotation.Service;
 import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.bean.BeanContainerHandlerChain;
 import com.jremoter.core.bean.BeanDefinition;
@@ -13,6 +15,7 @@ import com.jremoter.core.bean.BeanDefinitionFactory;
 import com.jremoter.core.bean.BeanScope;
 import com.jremoter.core.context.ApplicationContext;
 import com.jremoter.core.exception.BeanCircleReferenceException;
+import com.jremoter.core.exception.BeanDefinitionExistException;
 import com.jremoter.core.exception.BeanDefinitionMultipleException;
 import com.jremoter.core.exception.BeanDefinitionNotFoundException;
 import com.jremoter.core.logging.Logger;
@@ -23,6 +26,9 @@ import com.jremoter.core.proxy.ProxyFactory;
 import com.jremoter.core.toolkit.DirectedGraph;
 import com.jremoter.core.toolkit.DirectedGraphUtil;
 import com.jremoter.core.toolkit.ExtensionLoader;
+import com.jremoter.core.util.AnnotationUtil;
+import com.jremoter.core.util.ClassUtil;
+import com.jremoter.core.util.ReflectionUtil;
 import com.jremoter.core.util.StringUtil;
 
 public abstract class AbstractBeanContainer implements BeanContainer{
@@ -91,19 +97,9 @@ public abstract class AbstractBeanContainer implements BeanContainer{
 			beanDefinition.create();
 		}
 		
-		//创建后
-		for(BeanDefinition beanDefinition : this.beanDefinitionSet){
-			beanDefinition.afterCreate();
-		}
-		
 		//注入
 		for(BeanDefinition beanDefinition : this.beanDefinitionSet){
 			beanDefinition.inject();
-		}
-		
-		//注入后
-		for(BeanDefinition beanDefinition : this.beanDefinitionSet){
-			beanDefinition.afterInject();
 		}
 		
 		this.initial = true;
@@ -128,12 +124,51 @@ public abstract class AbstractBeanContainer implements BeanContainer{
 
 	@Override
 	public BeanDefinition attachBean(Class<?> requireType,BeanScope requireScope,String beanName){
-		return null;
+		if(this.initial){
+			return null;
+		}
+		if(null == requireType){
+			throw new NullPointerException("requireType");
+		}
+		String tempBeanName = beanName;
+		if(StringUtil.isBlank(tempBeanName)){
+			tempBeanName = ClassUtil.getCamelClassName(requireType);
+		}
+		String key = String.format("%s#%s",requireType.getName(),tempBeanName);
+		if(this.beanDefinitions.containsKey(key)){
+			throw new BeanDefinitionExistException(key);
+		}
+		BeanDefinition beanDefinition = this.beanDefinitionFactory.createBeanDefinition(this, requireType, requireScope, tempBeanName);
+		this.beanDefinitions.put(key,beanDefinition);//存储bean定义
+		log.debug("create bean definition success [{}] -> {}",beanDefinition.getClass(),beanDefinition);
+		
+		this.resolveMethodDefineBean(requireType,beanDefinition);
+		
+		return beanDefinition;
 	}
 
 	@Override
 	public BeanDefinition attachBean(Class<?> requireType, String beanName,Object beanInstance){
-		return null;
+		if(null == beanInstance){
+			throw new NullPointerException("instance");
+		}
+		if(null == requireType){
+			requireType = beanInstance.getClass();
+		}
+		if(StringUtil.isBlank(beanName)){
+			beanName = ClassUtil.getCamelClassName(requireType);
+		}
+		String key = String.format("%s#%s",requireType,beanName);
+		if(this.beanDefinitions.containsKey(key)){
+			throw new BeanDefinitionExistException(key);
+		}
+		BeanDefinition beanDefinition = this.beanDefinitionFactory.createBeanDefinition(this, requireType, beanName, beanInstance);
+		this.beanDefinitions.put(key,beanDefinition);//存储bean定义
+		log.debug("create bean definition success [{}] -> {}",beanDefinition.getClass(),beanDefinition);
+		
+		this.resolveMethodDefineBean(beanInstance.getClass(),beanDefinition);
+		
+		return beanDefinition;
 	}
 	
 	@Override
@@ -168,6 +203,29 @@ public abstract class AbstractBeanContainer implements BeanContainer{
 	@Override
 	public ProxyFactory getProxyFactory() {
 		return this.proxyFactory;
+	}
+	
+	protected void resolveMethodDefineBean(Class<?> requireType,BeanDefinition beanDefinition){
+		
+		for(Method method : ReflectionUtil.getDeclaredMethods(requireType)){
+			if(!AnnotationUtil.hasAnnotation(method,Service.class)){
+				continue;
+			}
+			if(method.getReturnType().equals(void.class)){
+				log.warn("method return type is void {}.{}",requireType,method.getName());
+				continue;
+			}
+			Service service = AnnotationUtil.getAnnotation(method,Service.class);
+			String methodBeanName = method.getName();
+			if(StringUtil.isNotBlank(service.value())){
+				methodBeanName = service.value();
+			}
+			String methodKey = String.format("%s#%s",method.getReturnType(),methodBeanName);
+			BeanDefinition methodBeanDefinition = this.beanDefinitionFactory.createBeanDefinition(this, requireType,service.scope(), methodBeanName, beanDefinition, method);
+			this.beanDefinitions.put(methodKey,methodBeanDefinition);
+			log.debug("create bean definition success [{}] -> {}",methodBeanDefinition.getClass(),methodBeanDefinition);
+		}
+		
 	}
 
 	//添加对象到有向图中

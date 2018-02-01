@@ -1,5 +1,6 @@
 package com.jremoter.core.bean.support;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 		this.beanType = beanType;
 		this.beanName = beanName;
 		this.beanScope = beanScope;
-		this.constructor = this.choseClassConstructor(this.beanType);
+		this.constructor = this.choseConstructor(this.beanType);
 	}
 	
 	@Override
@@ -89,19 +90,72 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 		this.destoryMethods.clear();
 	}
 	
+	@Override
+	public int hashCode() {
+		return this.toString().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(null == obj){
+			return false;
+		}
+		return this.toString().equals(obj.toString());
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s#%s",this.beanType.getName(),this.beanName);
+	}
+	
 	//调用初始化方法
 	protected void invokeInitialMethod(Object object){
-		
+		if(null == this.initialMethods || this.initialMethods.isEmpty()){
+			return;
+		}
+		for(Method method : this.initialMethods){
+			this.invokeMethodAndAutowired(method,object);
+		}
 	}
 	
 	//调用销毁方法
 	protected void invokeDestoryMethod(Object object){
-		
+		if(null == this.destoryMethods || this.destoryMethods.isEmpty()){
+			return;
+		}
+		for(Method method : this.destoryMethods){
+			this.invokeMethodAndAutowired(method,object);
+		}
 	}
 	
 	//注入
 	protected void injectObject(Object object){
 		
+	}
+	
+	protected Constructor<?> choseConstructor(Class<?> type){
+		return choseClassConstructor(type);
+	}
+	
+	//调用方法并自动注入参数
+	protected Object invokeMethodAndAutowired(Method method,Object object){
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		if(null == parameterTypes || parameterTypes.length == 0){
+			return ReflectionUtil.invokeMethod(method,object);
+		}else{
+			Annotation[] annotations = AnnotationUtil.getAnnotationFromParameter(method,Autowired.class);
+			Object[] parameterDatas = new Object[parameterTypes.length];
+			for(int i=0;i<parameterTypes.length;i++){
+				Class<?> parameterType = parameterTypes[i];
+				if(null == annotations[i]){
+					parameterDatas[i] = null;
+				}else{
+					Autowired autowired = (Autowired)annotations[i];
+					parameterDatas[i] = this.getBeanInstance(parameterType,autowired.value());
+				}
+			}
+			return ReflectionUtil.invokeMethod(method,object,parameterDatas);
+		}
 	}
 
 	protected List<Method> searchMethods(final boolean isInitialMethodAnnotation){
@@ -145,7 +199,7 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	// 1.默认搜索参数含有@Autowired注解的构造函数,如果多个构造函数都存在@Autowired注解,则使用最先搜索到的
 	// 2.如果搜索不到@Autowired注解的构造函数,则使用无参构造函数
 	// 3.如果没有无参构造函数,则使用当前搜索的构造函数,参数传递值为null
-	protected Constructor<?> choseClassConstructor(Class<?> type){
+	protected static Constructor<?> choseClassConstructor(Class<?> type){
 		Constructor<?>[] constructors = type.getConstructors();
 		Constructor<?> noAgreementsConstructor = null;
 		for(Constructor<?> constructor : constructors){
