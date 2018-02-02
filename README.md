@@ -10,4 +10,3 @@ jremoter为一款基于注解实现的IOC容器框架,功能类似于Spring,且�
 > * @JRemoterApplication
 >   > 说明
 > * @JRemoterApplication
->   > 说明
