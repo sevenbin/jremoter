@@ -13,7 +13,7 @@ public class BootStrap {
 		if(null == runner){
 			throw new NullPointerException("runner");
 		}
-		Runtime.getRuntime().addShutdownHook(new Thread(){
+		Runtime.getRuntime().addShutdownHook(new Thread("jremoter-shutdown-hook"){
 			@Override
 			public void run(){
 				try{
