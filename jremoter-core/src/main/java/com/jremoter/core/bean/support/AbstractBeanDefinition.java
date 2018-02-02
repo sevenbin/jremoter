@@ -15,10 +15,14 @@ import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.bean.BeanDefinition;
 import com.jremoter.core.bean.BeanScope;
 import com.jremoter.core.exception.BeanDefinitionNotFoundException;
+import com.jremoter.core.logging.Logger;
+import com.jremoter.core.logging.LoggerFactory;
 import com.jremoter.core.util.AnnotationUtil;
 import com.jremoter.core.util.ReflectionUtil;
 
 public abstract class AbstractBeanDefinition implements BeanDefinition{
+	
+	private static final Logger log = LoggerFactory.getLogger(AbstractBeanDefinition.class);
 	
 	protected final BeanContainer beanContainer;
 	protected final Class<?> beanType;
@@ -82,12 +86,14 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	public void initial(){
 		this.initialMethods = this.searchMethods(true);
 		this.destoryMethods = this.searchMethods(false);
+		log.debug("initial {} success",this.toString());
 	}
 	
 	@Override
 	public void destory(){
 		this.initialMethods = null;
 		this.destoryMethods = null;
+		log.debug("destory {} success",this.toString());
 	}
 	
 	@Override

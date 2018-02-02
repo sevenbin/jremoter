@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.jremoter.core.Constant;
+import com.jremoter.core.annotation.Configuration;
 import com.jremoter.core.annotation.Service;
 import com.jremoter.core.bean.BeanScope;
 import com.jremoter.core.logging.Logger;
@@ -25,14 +26,20 @@ public class AnnotationApplicationContext extends AbstractApplicationContext{
 	
 	@Override
 	protected BeanScope getBeanScope(Class<?> type){
-		Service service = AnnotationUtil.getAnnotation(type,Service.class);
-		return service.scope();
+		if(AnnotationUtil.hasAnnotation(type,Service.class)){
+			Service service = AnnotationUtil.getAnnotation(type,Service.class);
+			return service.scope();
+		}
+		return BeanScope.Singleton;
 	}
 
 	@Override
 	protected String getBeanName(Class<?> type){
-		Service service = AnnotationUtil.getAnnotation(type,Service.class);
-		return service.value();
+		if(AnnotationUtil.hasAnnotation(type,Service.class)){
+			Service service = AnnotationUtil.getAnnotation(type,Service.class);
+			return service.value();
+		}
+		return null;
 	}
 	
 	@Override
@@ -40,7 +47,7 @@ public class AnnotationApplicationContext extends AbstractApplicationContext{
 		if(type.isInterface() || Modifier.isAbstract(type.getModifiers())){
 			return false;
 		}
-		if(AnnotationUtil.hasAnnotation(type,Service.class)){
+		if(AnnotationUtil.hasAnnotation(type,Service.class) || AnnotationUtil.hasAnnotation(type,Configuration.class)){
 			return true;
 		}
 		return false;
