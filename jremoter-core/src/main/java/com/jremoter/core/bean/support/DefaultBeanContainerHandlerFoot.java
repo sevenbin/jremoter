@@ -17,7 +17,12 @@ public class DefaultBeanContainerHandlerFoot extends DefaultBeanContainerHandler
 	public BeanContainerHandler getHandler(){
 		return this;
 	}
-
+	
+	@Override
+	public void onCreate(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance) {
+		
+	}
+	
 	@Override
 	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance){
 		

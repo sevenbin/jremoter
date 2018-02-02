@@ -5,6 +5,11 @@ import com.jremoter.core.bean.BeanContainerHandler;
 import com.jremoter.core.bean.BeanDefinition;
 
 public class DefaultBeanContainerHandler implements BeanContainerHandler{
+	
+	@Override
+	public void onCreate(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance) {
+		
+	}
 
 	@Override
 	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition,Object instance){

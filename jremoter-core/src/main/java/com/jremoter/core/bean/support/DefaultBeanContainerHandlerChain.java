@@ -34,6 +34,15 @@ public class DefaultBeanContainerHandlerChain extends AbstractHandlerChain<BeanC
 	protected HandlerContext<BeanContainerHandler> createHandlerContext(String name, BeanContainerHandler handler){
 		return new DefaultBeanContainerHandlerContext(this,name,handler);
 	}
+	
+	@Override
+	public void onCreate(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance) {
+		HandlerContext<BeanContainerHandler> context = this.head.getNext();
+		while(context != this.foot){
+			context.getHandler().onCreate(beanContainer, beanDefinition, instance);
+			context = context.getNext();
+		}
+	}
 
 	@Override
 	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance){

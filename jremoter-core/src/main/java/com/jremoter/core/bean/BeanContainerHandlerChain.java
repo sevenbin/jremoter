@@ -6,6 +6,8 @@ public interface BeanContainerHandlerChain extends HandlerChain<BeanContainerHan
 	
 	public BeanContainer getBeanContainer();
 	
+	public void onCreate(BeanContainer beanContainer,BeanDefinition beanDefinition,Object instance);
+	
 	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition,Object instance);
 	
 	public boolean onNeedProxy(BeanContainer beanContainer,BeanDefinition beanDefinition);

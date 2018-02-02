@@ -14,6 +14,7 @@ import com.jremoter.core.annotation.InitialMethod;
 import com.jremoter.core.bean.BeanContainer;
 import com.jremoter.core.bean.BeanDefinition;
 import com.jremoter.core.bean.BeanScope;
+import com.jremoter.core.exception.BeanCreateException;
 import com.jremoter.core.exception.BeanDefinitionNotFoundException;
 import com.jremoter.core.logging.Logger;
 import com.jremoter.core.logging.LoggerFactory;
@@ -222,11 +223,17 @@ public abstract class AbstractBeanDefinition implements BeanDefinition{
 	}
 	
 	protected Object createInstance(BeanContainer beanContainer,BeanDefinition beanDefinition){
+		Object result = null;
 		if(this.needCreateProxy()){
-			return this.beanContainer.getProxyFactory().createProxy(beanContainer,beanDefinition);
+			result = this.beanContainer.getProxyFactory().createProxy(beanContainer,beanDefinition);
 		}else{
-			return this.invokeConstructorAndAutowired(this.constructor);
+			result = this.invokeConstructorAndAutowired(this.constructor);
 		}
+		if(null == result){
+			throw new BeanCreateException(beanDefinition.toString());
+		}
+		beanContainer.getBeanContainerHandlerChain().onCreate(beanContainer, beanDefinition, result);
+		return result;
 	}
 	
 	// 选择最优的构造函数

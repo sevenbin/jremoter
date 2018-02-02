@@ -19,6 +19,11 @@ public class DefaultBeanContainerHandlerHead extends DefaultBeanContainerHandler
 	}
 	
 	@Override
+	public void onCreate(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance) {
+		
+	}
+	
+	@Override
 	public void onInject(BeanContainer beanContainer,BeanDefinition beanDefinition, Object instance){
 		
 	}
