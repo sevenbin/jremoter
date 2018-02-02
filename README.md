@@ -8,7 +8,7 @@ jremoter为一款基于注解实现的IOC容器框架,功能类似于Spring,且�
 * @Configuration
 	> 配置类,可设置扫描的包信息
 * @Service
-	> 指定类通过JRemoter进行实例化
+	> 指定类通过JRemoter进行实例化,可标注在方法上.并通过手动实例化
 * @Autowired
 	> 自动注入指定类型的类
 * @Value
