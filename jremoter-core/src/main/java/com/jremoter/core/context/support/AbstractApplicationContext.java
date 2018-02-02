@@ -45,6 +45,9 @@ public abstract class AbstractApplicationContext extends DefaultPackageScannerHa
 		if(!AnnotationUtil.hasAnnotation(runner,JRemoterApplication.class)){
 			throw new IllegalArgumentException("runner class missing @JRemoterApplication annotation");
 		}
+		JRemoterApplication jRemoterApplication = AnnotationUtil.getAnnotation(runner,JRemoterApplication.class);
+		System.setProperty(Constant.K_CONFIGURATION_NAME,jRemoterApplication.name());
+		System.setProperty(Constant.K_CONFIGURATION_PATH,jRemoterApplication.path());
 		this.runner = runner;
 		this.configuration = AbstractConfiguration.getConfiguration();
 		this.banner = ExtensionLoader.getService(ApplicationContextBanner.class,this.configuration.getOption(Constant.O_BANNER));

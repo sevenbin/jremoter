@@ -14,11 +14,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.jremoter.core.Constant;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface JRemoterApplication {
 	
-	
+	public String name() default Constant.V_CONFIGURATION_NAME;
+	public String path() default Constant.V_CONFIGURATION_PATH;
 	
 }
