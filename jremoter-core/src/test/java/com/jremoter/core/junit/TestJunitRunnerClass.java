@@ -6,11 +6,11 @@ import org.junit.runner.RunWith;
 import com.jremoter.core.annotation.JRemoterApplication;
 import com.jremoter.core.annotation.Value;
 
-@JRemoterApplication
+@JRemoterApplication(name="demo")
 @RunWith(JRemoterJunitForClassRunner.class)
 public class TestJunitRunnerClass {
 	
-	@Value("jremoter.package_scanner")
+	@Value("demo.name")
 	private String name;
 	
 	@Test
