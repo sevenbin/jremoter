@@ -10,7 +10,7 @@ public class DefaultApplicationContextBanner implements ApplicationContextBanner
 	
 	@Override
 	public void write(PrintStream printStream){
-		printStream.println("----------------------------------------------------------------------");
+		printStream.println("======================================================================");
 		printStream.println("                 _ _____                      _                       ");
 		printStream.println("                | |  __ \\                    | |                      ");
 		printStream.println("                | | |__) |___ _ __ ___   ___ | |_ ___ _ __            ");
@@ -18,9 +18,9 @@ public class DefaultApplicationContextBanner implements ApplicationContextBanner
 		printStream.println("           | |__| | | \\ \\  __/ | | | | | (_) | ||  __/ |              ");
 		printStream.println("            \\____/|_|  \\_\\___|_| |_| |_|\\___/ \\__\\___|_|              ");
 		printStream.println("                                                                      ");
-		printStream.println("----------------------------------------------------------------------");
+		printStream.println("======================================================================");
 		printStream.println("                            KoKo  v0.0.5                              ");
-		printStream.println("----------------------------------------------------------------------");
+		printStream.println("======================================================================");
 	}
 	
 }
