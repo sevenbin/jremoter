@@ -18,11 +18,7 @@ public class DemoMemberBizImpl implements IMemberBiz{
 	
 	@InitialMethod
 	public void initial(){
-		try{
-			Thread.sleep(10000);
-		}catch(InterruptedException e){
-			e.printStackTrace();
-		}
+		System.out.println("init");
 	}
 	
 }
